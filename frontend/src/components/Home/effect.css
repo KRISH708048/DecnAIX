@@ -1,0 +1,9 @@
+@keyframes glow {
+  0% { box-shadow: 0 0 5px #ffbf00; }
+  50% { box-shadow: 0 0 20px #ffbf00; }
+  100% { box-shadow: 0 0 5px #ffbf00; }
+}
+
+.animate-glow {
+  animation: glow 1.5s infinite alternate;
+}
