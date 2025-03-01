@@ -1,6 +1,8 @@
 @import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
 body {
-  background-color: #5B2333;
+  background-color: #5b2333;
 }
 @layer base {
   :root {
@@ -28,7 +30,7 @@ body {
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
-    --radius: 0.5rem
+    --radius: 0.5rem;
   }
   .dark {
     --background: 240 10% 3.9%;
@@ -54,17 +56,10 @@ body {
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%
+    --chart-5: 340 75% 55%;
   }
 }
-/* @layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-} */
+
 .offsetstyle {
   box-shadow: 2px 2px 0 0 black, 4px 4px 4px 0 #0f172a;
   transition: all 300ms ease-in-out;
@@ -107,3 +102,60 @@ body {
 .fade-in {
   animation: fadeIn 1.5s ease-out forwards;
 }
+
+/* @layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+} */
+
+/* @layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+} */
+
+/* @layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+} */
+
+@keyframes borderGlow {
+  0% { border-color: rgba(255, 75, 75, 0.2); }
+  50% { border-color: rgba(255, 75, 75, 0.6); }
+  100% { border-color: rgba(255, 75, 75, 0.2); }
+}
+.animate-borderGlow {
+  animation: borderGlow 3s infinite alternate;
+}
+
+@keyframes glitch {
+  0% { transform: skew(0deg); }
+  20% { transform: skew(-4deg); }
+  40% { transform: skew(3deg); }
+  60% { transform: skew(-2deg); }
+  80% { transform: skew(1deg); }
+  100% { transform: skew(0deg); }
+}
+.animate-glitch {
+  animation: glitch 1.2s infinite alternate;
+}
+
+/* @layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+} */

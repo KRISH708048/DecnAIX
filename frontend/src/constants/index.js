@@ -25,7 +25,7 @@ export const benefits = [
       text: "Having some resources? some idle computers, some RAM, some GPU? then join our network and start earning by renting out your resources",
       backgroundUrl: "./src/assets/benefits/card-3.svg",
       iconUrl: Icon3,
-      imageUrl: Service3,
+      imageUrl: Service5,
     },
     {
       id: "2",

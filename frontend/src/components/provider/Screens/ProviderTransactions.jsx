@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Copy, Wallet } from "lucide-react";
 
-export default function Transactions() {
+export default function ProviderTransactions() {
   const [transactions] = useState([
     {
       version: "2401156913",

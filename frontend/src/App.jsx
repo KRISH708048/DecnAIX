@@ -7,6 +7,11 @@ import FeaturesWeights from "./components/Rent/Screens/FeaturesWeights";
 import CreateTask from "./components/Rent/Screens/CreateTask";
 import SelectMachine from "./components/Rent/Screens/SelectMachine";
 import Transactions from "./components/Rent/Screens/Transactions";
+import ProviderLayout from "./components/provider/ProviderLayout";
+import ProviderDashboard from "./components/provider/Screens/ProviderDashboard";
+import ProviderTransactions from "./components/provider/Screens/ProviderTransactions";
+import Machine from "./components/provider/Screens/Machine";
+import Computation from "./components/provider/Screens/Computation";
 
 function App() {
   return (
@@ -25,6 +30,12 @@ function App() {
             <Route path="create-task" element={<CreateTask />} />
             <Route path="select-machine" element={<SelectMachine />} />
             <Route path="transactions" element={<Transactions />} />
+          </Route>
+          <Route path="/Provider" element={<ProviderLayout />}>
+            <Route index element={<ProviderDashboard />} />
+            <Route path="transactions" element={<ProviderTransactions />} />
+            <Route path="machines" element={<Machine />} />
+            <Route path="computation" element={<Computation />} />
           </Route>
         </Routes>
       </Router>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Features from "./Features/Features";
+// import Features from "./Features/Features";
 import { Link } from "react-router-dom";
 import { Button } from "../ui/button";
 import { PanelLeftOpen, PanelTopOpen, Wallet2 } from "lucide-react";
@@ -13,17 +13,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import RentTabs from "./RentTabs";
-import Transactions from "./Screens/Transactions";
-import FeaturesWeights from "./Screens/FeaturesWeights";
-import SelectMachine from "./Screens/SelectMachine";
-import CreateTask from "./Screens/CreateTask";
+import ProviderTabs from "./ProviderTabs";
+import ProviderTransactions from "./Screens/ProviderTransactions";
+import Computation from "./Screens/Computation";
+import Machine from "./Screens/Machine";
+// import SelectMachine from "./Screens/SelectMachine";
+// import CreateTask from "./Screens/CreateTask";
 
 const tabs = [
-  <Transactions key={0} />,
-  <FeaturesWeights key={1} />,
-  <SelectMachine key={2} />,
-  <CreateTask key={3} />,
+  <ProviderTransactions key={0} />,
+  <Machine key={1} />,
+  <Computation key={2} />,
 ];
 const Header = () => {
   const [activeTab, setActiveTab] = useState(-1);
@@ -57,12 +57,13 @@ const Header = () => {
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link
-                  to="/provider"
+                  to="/rent"
                   className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-800"
                 >
-                  <Server size={20} /> <span>Provider</span>
+                  <Server size={20} /> <span>Rent</span>
                 </Link>
               </DropdownMenuItem>
+              
               <DropdownMenuItem asChild>
                 <Link
                   to="/about"
@@ -94,14 +95,16 @@ const Header = () => {
       <div className="flex items-center gap-4">
         {/* Features for Desktop */}
         <div className="hidden md:flex">
-          <RentTabs
+          <ProviderTabs
             activeIdx={activeTab}
             onChange={(val) => {
               setActiveTab(val);
             }}
           />
         </div>
-
+        <Button className="flex items-center gap-2 px-5 py-2 bg-[#F7F4F3] border-2 border-transparent rounded-lg text-[#3C1A2B] font-semibold transition-all hover:bg-[#5B2333] hover:text-white hover:border-white">
+          SignIn
+        </Button>
         {/* Connect Wallet Button */}
         <Button className="flex items-center gap-2 px-5 py-2 bg-[#F7F4F3] border-2 border-transparent rounded-lg text-[#3C1A2B] font-semibold transition-all hover:bg-[#5B2333] hover:text-white hover:border-white">
           Connect Wallet <Wallet2 size={20} />

@@ -2,7 +2,7 @@ import React from "react";
 import { Outlet } from "react-router-dom";
 import Header from "./Header";
 
-const Layout = () => {
+const ProviderLayout = () => {
   return (
     <div className="min-h-screen w-full flex flex-col dark:text-white font-extrabold">
       <div className="w-full fixed top-0 left-0 right-0 shadow-md z-1000">
@@ -16,4 +16,4 @@ const Layout = () => {
   );
 };
 
-export default Layout;
+export default ProviderLayout;
