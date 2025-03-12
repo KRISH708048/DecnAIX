@@ -12,6 +12,7 @@ import ProviderDashboard from "./components/provider/Screens/ProviderDashboard";
 import ProviderTransactions from "./components/provider/Screens/ProviderTransactions";
 import Machine from "./components/provider/Screens/Machine";
 import Computation from "./components/provider/Screens/Computation";
+import AuthPage from "./components/Home/AuthPage";
 
 function App() {
   return (
@@ -21,7 +22,7 @@ function App() {
         <Routes>
           {/* Home Route */}
           <Route path="/" element={<Home />} />
-          
+          <Route path="/auth"element={<AuthPage />} />
           {/* Rent Layout with nested routes */}
           <Route path="/Rent" element={<Layout />}>
             <Route index element={<Dashboard />} />

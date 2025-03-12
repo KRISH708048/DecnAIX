@@ -82,7 +82,7 @@ export default function SearchWrapper() {
           {paginatedMachines.map((machine) => (
             <Card
               key={machine._id}
-              className="relative mx-auto w-96 h-[24rem] bg-[#5b2333] bg-opacity-90 text-white shadow-xl rounded-2xl overflow-hidden transition-transform hover:scale-105 hover:shadow-[0_0_25px_rgba(255,75,75,0.5)]"
+              className="relative mx-auto w-96 h-[20rem] bg-[#5b2333] bg-opacity-90 text-white shadow-xl rounded-2xl overflow-hidden transition-transform hover:scale-105 hover:shadow-[0_0_25px_rgba(255,75,75,0.5)]"
             >
               {/* Background with Cyber Glow & Glassmorphism */}
               <div
@@ -100,36 +100,39 @@ export default function SearchWrapper() {
               </div>
 
               {/* Card Header */}
-              <CardHeader className="relative z-10 px-6">
-                <CardTitle className="text-3xl font-extrabold tracking-wide text-white neon-text animate-glitch">
-                  {machine.name}
-                </CardTitle>
-              </CardHeader>
+              <div className="z-10 flex flex-col justify-between h-full">
+                <CardHeader className="relative z-10 px-6">
+                  <CardTitle className="text-3xl font-extrabold tracking-wide text-white neon-text animate-glitch">
+                    {machine.name}
+                  </CardTitle>
+                </CardHeader>
 
-              {/* Card Content */}
-              <CardContent className="relative z-10 p-4 space-y-2 text-white">
-                <div className="flex items-center space-x-2">
-                  ⏳ <span className="font-semibold">Time:</span> {machine.time}
-                </div>
-                <div className="flex items-center space-x-2">
-                  💾 <span className="font-semibold">RAM:</span> {machine.ram}{" "}
-                  GB
-                </div>
-                <div className="flex items-center space-x-2">
-                  🖥 <span className="font-semibold">CPU:</span> {machine.cpu}{" "}
-                  Cores
-                </div>
-                <div className="flex items-center space-x-2">
-                  📂 <span className="font-semibold">Storage:</span>{" "}
-                  {machine.size}
-                </div>
-              </CardContent>
+                {/* Card Content */}
+                <CardContent className="relative z-10 p-4 grid grid-cols-2 space-y-2 text-white">
+                  <div className="flex items-center space-x-2">
+                    ⏳ <span className="font-semibold">Time:</span>{" "}
+                    {machine.time}
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    💾 <span className="font-semibold">RAM:</span> {machine.ram}{" "}
+                    GB
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    🖥 <span className="font-semibold">CPU:</span> {machine.cpu}{" "}
+                    Cores
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    📂 <span className="font-semibold">Storage:</span>{" "}
+                    {machine.size}
+                  </div>
+                </CardContent>
 
-              {/* Glowing Action Button */}
-              <div className="relative z-10 px-6 pb-6">
-                <button className="w-full py-3 text-lg font-bold text-white bg-[#ff4d4d] rounded-lg shadow-lg shadow-red-500/50 hover:bg-[#cc3838] hover:shadow-red-300/50 transition-all">
-                  ⚡ Select Machine
-                </button>
+                {/* Glowing Action Button */}
+                <div className="relative z-10 px-6">
+                  <button className="w-full py-3 text-lg font-bold text-white bg-[#ff4d4d] rounded-lg shadow-lg shadow-red-500/50 hover:bg-[#cc3838] hover:shadow-red-300/50 transition-all">
+                    ⚡ Select Machine
+                  </button>
+                </div>
               </div>
             </Card>
           ))}
