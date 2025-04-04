@@ -2,37 +2,56 @@ import express from 'express';
 import bcrypt from 'bcrypt';
 import jwt  from 'jsonwebtoken';
 import User from '../models/userModel.js';
+import zod from "zod";
 
 const router = express.Router();
 
-// Sign Up Route
+const roleEnum = zod.enum(["Tenant", "Provider", "Both"]);
+
+const signUpSchema = zod.object({
+    email: zod.string().email(),
+    password: zod.string().length(8),
+    name: zod.string(),
+    walletAddress: zod.string(),
+    role: roleEnum,
+})
+
+const signInSchema = zod.object({
+    email: zod.string().email(),
+    password: zod.string().length(8)
+})
 router.post('/sign-up', async (req, res) => {
     try {
-        const { email, password, name, role, walletAddress } = req.body;
-        console.log(email, password, name, role, walletAddress);
+        const userDetail = req.body;
+        console.log(userDetail.email, userDetail.password, userDetail.name, userDetail.role, userDetail.walletAddress);
+        const response = signUpSchema.safeParse(userDetail);
+        if (!response.success) {
+            return res.status(411).json({
+                message: "Incorrect Fields Provided",
+            })
+        }
 
-        // Check if the user already exists
-        const existingUser = await User.findOne({ email });
+        const existingUser = await User.findOne({ email: userDetail.email });
         if (existingUser) {
             console.log(existingUser);
             return res.status(409).json({ message: 'User already exists' });
         }
 
-        // Hash the passwordss
+        // Hash the passwords
         const saltRounds = 10;
-        const hashedPassword = await bcrypt.hash(password, saltRounds);
+        const hashedPassword = await bcrypt.hash(userDetail.password, saltRounds);
 
         // Create a new user
-        const newUser = new User({
-            email,
-            name,
-            hashedPassword,
-            role: role || 'Universal',
-            wallet_address: walletAddress,
+        const newUser = await User.create({
+            name: userDetail.name, 
+            email: userDetail.email,
+            hashedPassword: hashedPassword,
+            role: userDetail.role || 'Both',
+            wallet_address: userDetail.walletAddress,
         });
-        await newUser.save();
-
-        return res.status(201).json({ message: 'User registered successfully', user: {userId : newUser._id} });
+        const userId = newUser._id;
+        console.log(userId);
+        return res.status(201).json({ message: 'User registered successfully', user: {userId : userId} });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Internal Server Error' });
@@ -42,40 +61,43 @@ router.post('/sign-up', async (req, res) => {
 // Login Route
 router.post('/login', async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const userDetail = req.body;
+        const response = signInSchema.safeParse(userDetail);
+        
+        if (!response.success) {
+            return res.status(411).json({
+                message: "Incorrect inputs"
+            })
+        }
 
-        // Find the user from MongoDB by email
-        const user = await User.findOne({ email });
+        const user = await User.findOne({email: userDetail.email});
         if (!user) {
             return res.status(401).json({ message: 'User not found, Sign-up!' });
         }
 
-        // Verify the password
-        const isVerified = await bcrypt.compare(password, user.hashedPassword);
+        const isVerified = await bcrypt.compare(userDetail.password, user.hashedPassword);
         if (!isVerified) {
-            return res.status(401).json({ message: 'Invalid credentials' });
+            return res.status(401).json({ message: 'Invalid Passwords' });
         }
 
-
-        // Generate a JWT with user _id
-        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '4h' });
-        console.log(token);
+        // JWT token
+        const userId = user._id;
+        const token = jwt.sign({ userId: userId }, process.env.JWT_SECRET, { expiresIn: '4h' });
         // Set the cookie with the token
-        res.cookie('authToken', token, {
-            httpOnly: true,  // Prevents client-side JS access (security best practice)
-            secure: process.env.NODE_ENV === 'production', // Only send over HTTPS in production
-            sameSite: 'Strict', // Protects against CSRF attacks
-            maxAge: 4 * 60 * 60 * 1000, // Cookie expiry time (4 hours)
-        });
+        // res.cookie('authToken', token, {
+        //     httpOnly: true,  // Prevents client-side JS access (security best practice)
+        //     secure: process.env.NODE_ENV === 'production', // Only send over HTTPS in production
+        //     sameSite: 'Strict', // Protects against CSRF attacks
+        //     maxAge: 4 * 60 * 60 * 1000, // Cookie expiry time (4 hours)
+        // });
 
-        // Respond with a success message and user info
         res.status(200).json({
             message: 'Login successful', user: {
                 id: user._id,
                 name: user.name,
                 role: user.role,
                 email: user.email,
-            }
+            }, token: token
         });
     } catch (err) {
         console.error(err);

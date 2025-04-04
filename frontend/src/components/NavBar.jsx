@@ -3,9 +3,10 @@ import { Link, NavLink, useLocation } from "react-router-dom";
 import { Button } from "./ui/button";
 import { Wallet2, Menu, X } from "lucide-react";
 import Layout from "./Rent/Layout";
+
 const NavBar = () => {
   const pathname = useLocation();
-  const [isOpen, setIsOpen] = useState(false); // To manage the mobile menu toggle
+  const [isOpen, setIsOpen] = useState(false);
 
   const menuList = [
     { name: "Home", path: "/" },

@@ -4,7 +4,9 @@ import mongoose from 'mongoose';
 
 const password = process.env.MONGO_PASSWORD;
 
-mongoose.connect(`mongodb+srv://Krish:${password}@decnaix.1c615.mongodb.net/decenAIX?retryWrites=true&w=majority`, {
+// mongodb+srv://krishagarwal7080:decenAIX@cluster0.lehtyug.mongodb.net/
+
+mongoose.connect(`mongodb+srv://krishagarwal7080:${password}@cluster0.lehtyug.mongodb.net/decenAI`, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 }).then(() => {

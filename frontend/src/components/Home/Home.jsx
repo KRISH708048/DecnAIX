@@ -10,7 +10,7 @@ import NavBar from "../NavBar";
 
 const Home = () => {
   const [uploading, setUploading] = useState(true);
-  const serviceRef = useRef(null); // Reference to Service section
+  const serviceRef = useRef(null); 
   const [startGlow, setStartGlow] = useState(false);
 
   useEffect(() => {

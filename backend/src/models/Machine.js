@@ -4,11 +4,11 @@ const { Schema } = mongoose;
 const machineSchema = new Schema(
   {
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    title: { type: String, required: true },
-    type: {type: String, enum: ['HIGH', 'MID', 'BASIC', 'LOW'], default: 'BASIC'},
+    name: { type: String, required: true, unique: true },
+    category: {type: String, enum: ['HIGH', 'MID', 'BASIC'], default: 'BASIC'},
     cpu: { type: String, required: true },
     ram: { type: String, required: true },
-    size: { type: String, required: true },
+    storage: { type: String, required: true },
     available: { type: Boolean, default: true },
   },
   { timestamps: true }

@@ -3,11 +3,11 @@ const { Schema } = mongoose;
 
 const userSchema = new Schema(
   {
-    email: { type: String, required: true, unique: true},
     name: { type: String, required: true},
-    role: { type: String, enum: ['DEVELOPER', 'GPU_CONTRIBUTOR'], default: 'UNIVERSAL' },
+    email: { type: String, required: true, unique: true},
+    role: { type: String, enum: ['Tenant', 'Provider', 'Both'], default: 'Both', required: true },
     hashedPassword: { type: String, required: true },
-    passwordSalt: { type: String },
+    // passwordSalt: { type: String },
     wallet_address: { type: String, required: true },
   },
   { timestamps: true }

@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
-app.use(cookieParser());
+// app.use(cookieParser());
 app.use(cors());
 app.use(bodyParser.json());
 

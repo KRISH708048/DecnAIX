@@ -1,17 +1,13 @@
 import express from 'express';
-import machineController from "../services/gpuService.js";
-
-const { createMachine, getAllMachines, getMachinesByUserId } = machineController;
+import machineController from "../controller/machines.js";
+import authenticate from "../middlewares/authMiddleware.js"
 
 const router = express.Router();
 
-// Create a machine
-router.post('/machines/create', createMachine);
+const { createMachine, getAllMachines, getMachinesByUserId } = machineController;
 
-// Get all machines
-router.get('/machines/all', getAllMachines);
-
-// Get machines by user ID
-router.get('/machines/:userID', getMachinesByUserId);
+router.post('/machines/create', authenticate, createMachine);
+router.get('/machines/all', authenticate, getAllMachines);
+router.get('/machines/:userID', authenticate, getMachinesByUserId);
 
 export default router;
