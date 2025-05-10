@@ -19,7 +19,7 @@ const Dashboard = () => {
           like never before!
         </p>
 
-        <div className="flex gap-10 mt-20 h-56 w-full justify-between">
+        <div className="flex flex-col md:flex-row space-y-10 md:space-x-6 mt-20 md: h-56 w-full justify-between">
           <div className="w-full min-h-4xl sm:w-1/2 bg-gradient-to-br from-[#674943] to-[#994532] rounded-2xl p-8 shadow-xl hover:scale-105 transform transition-all duration-300">
             <h2 className="text-3xl font-bold text-white">
               Empower Your Tasks

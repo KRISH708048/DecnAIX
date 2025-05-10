@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-// import Features from "./Features/Features";
 import { Link, NavLink } from "react-router-dom";
 import { Button } from "../ui/button";
-import { PanelLeftOpen, PanelTopOpen, Wallet2 } from "lucide-react";
+import { PanelTopOpen, Wallet2 } from "lucide-react";
 import { Home, Info, LogOut, Server } from "lucide-react";
 import {
   DropdownMenu,
@@ -103,9 +102,9 @@ const Header = () => {
           />
         </div>
         <NavLink to={"/auth"} className="hidden md:flex">
-        <Button className="flex items-center gap-2 px-5 py-2 bg-[#F7F4F3] border-2 border-transparent rounded-lg text-[#3C1A2B] font-semibold transition-all hover:bg-[#5B2333] hover:text-white hover:border-white">
-          SignIn
-        </Button>
+          <Button className="flex items-center gap-2 px-5 py-2 bg-[#F7F4F3] border-2 border-transparent rounded-lg text-[#3C1A2B] font-semibold transition-all hover:bg-[#5B2333] hover:text-white hover:border-white">
+            SignIn
+          </Button>
         </NavLink>
         {/* Connect Wallet Button */}
         <Button className="flex items-center gap-2 px-5 py-2 bg-[#F7F4F3] border-2 border-transparent rounded-lg text-[#3C1A2B] font-semibold transition-all hover:bg-[#5B2333] hover:text-white hover:border-white">

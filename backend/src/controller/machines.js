@@ -78,6 +78,7 @@ const getAllMachines = async (req, res) => {
           machines: {
             $push: {
               _id: "$_id",
+              walletAddress: "$walletAddress",
               name: "$name",
               cpu: "$cpu",
               ram: "$ram",
@@ -108,10 +109,7 @@ const getAllMachines = async (req, res) => {
 // Get machines by user ID
 const getMachinesByUserId = async (req, res) => {
   try {
-    const { userID } = req.params;
-
-    console.log("Fetching machines for user:", userID);
-
+    const userID  = req.userId;
     // Use `findById` for efficiency
     const user = await User.findById(userID);
     if (!user) {

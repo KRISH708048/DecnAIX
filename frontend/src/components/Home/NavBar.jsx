@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import { Wallet2, Menu, X } from "lucide-react";
-import Layout from "./Rent/Layout";
+import Layout from "../Rent/RentLayout";
+import { useRecoilValue } from "recoil";
+import { userAtom } from "@/store/authAtom";
 
 const NavBar = () => {
   const pathname = useLocation();
   const [isOpen, setIsOpen] = useState(false);
-
+  const user = useRecoilValue(userAtom);
   const menuList = [
     { name: "Home", path: "/" },
     { name: "Rent", path: "/Rent" },
@@ -73,17 +75,16 @@ const NavBar = () => {
           </ul>
 
           {/* Connect Wallet Button (appears on larger screens) */}
-          <div className="md:block hidden">
-            <Button
-              asChild
-              className="flex items-center gap-2 px-6 bg-white border-4 offsetstyle generalBorder text-black hover:text-[#F7F4F3] hover:bg-[#5B2333]"
-            >
-              <Link to="">
-                Connect Wallet
+          {user.userId ? (
+            <h3 className="font-semibold text-xl"> hey, {user.name.split(" ")[0]}</h3>
+          ) : (
+            <NavLink to="/auth" className="">
+              <Button className="flex items-center gap-8 bg-white border-4 offsetstyle generalBorder text-black hover:text-[#F7F4F3] hover:bg-[#5B2333]">
+                Login
                 <Wallet2 />
-              </Link>
-            </Button>
-          </div>
+              </Button>
+            </NavLink>
+          )}
         </div>
       </nav>
     </div>

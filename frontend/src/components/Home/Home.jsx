@@ -6,7 +6,7 @@ import { ArrowRight } from "lucide-react";
 import Service4 from "../../assets/svg/robot.png";
 import "./effect.css";
 import Service from "./Service";
-import NavBar from "../NavBar";
+import NavBar from "./NavBar";
 
 const Home = () => {
   const [uploading, setUploading] = useState(true);

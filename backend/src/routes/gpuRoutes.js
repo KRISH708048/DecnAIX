@@ -8,6 +8,6 @@ const { createMachine, getAllMachines, getMachinesByUserId } = machineController
 
 router.post('/machines/create', authenticate, createMachine);
 router.get('/machines/all', authenticate, getAllMachines);
-router.get('/machines/:userID', authenticate, getMachinesByUserId);
+router.get('/machines/userMachine', authenticate, getMachinesByUserId);
 
 export default router;

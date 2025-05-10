@@ -6,7 +6,7 @@ import { Book, Box, Touchpad, Computer } from "lucide-react";
 const options = [
   { name: "Transactions", icon: Book, path: "/Rent/transactions" },
   { name: "Weights", icon: Box, path: "/Rent/features-weights" },
-  // { name: "Create Task", icon: Touchpad, path: "/Rent/create-task" },
+  { name: "Create Task", icon: Touchpad, path: "/Rent/create-task" },
   { name: "Select Machine", icon: Computer, path: "/Rent/select-machine" },
 ];
 

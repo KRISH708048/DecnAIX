@@ -1,7 +1,10 @@
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { useEffect } from "react";
+import { useRecoilState } from "recoil";
+import { userAtom } from "@/store/authAtom";
+import { Route, Routes, useNavigate } from "react-router-dom";
 import Home from "./components/Home/Home";
 import "./App.css";
-import Layout from "./components/Rent/Layout";
+import Layout from "./components/Rent/RentLayout";
 import Dashboard from "./components/Rent/Screens/Dashboard";
 import FeaturesWeights from "./components/Rent/Screens/FeaturesWeights";
 import CreateTask from "./components/Rent/Screens/CreateTask";
@@ -13,11 +16,43 @@ import ProviderTransactions from "./components/provider/Screens/ProviderTransact
 import Machine from "./components/provider/Screens/Machine";
 import Computation from "./components/provider/Screens/Computation";
 import AuthPage from "./components/Home/AuthPage";
+import AddMachine from "./components/provider/Features/AddMachine";
 
 function App() {
+  const navigate = useNavigate();
+  const [user, setUser] = useRecoilState(userAtom);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const expiry = parseInt(localStorage.getItem("tokenExpiry"), 10);
+    const userData = JSON.parse(localStorage.getItem("user"));
+
+    if (token && expiry > Date.now() && userData) {
+      setUser({
+        userId: userData.id,
+        name: userData.name,
+        role: userData.role,
+        validTill: expiry.toString(),
+      });
+
+      switch (userData.role) {
+        case "Both":
+          navigate("/");
+          break;
+        case "Tenant":
+          navigate("/Rent");
+          break;
+        case "Provider":
+          navigate("/Provider");
+          break;
+        default:
+          navigate("/");
+      }
+    }
+  }, []);
   return (
     <main className="App min-h-[calc(100svh-81px)]" id="app">
-      <Router>
+
         {/* <NavBar /> */}
         <Routes>
           {/* Home Route */}
@@ -35,11 +70,11 @@ function App() {
           <Route path="/Provider" element={<ProviderLayout />}>
             <Route index element={<ProviderDashboard />} />
             <Route path="transactions" element={<ProviderTransactions />} />
+            <Route path="add-machines" element={<AddMachine />} />
             <Route path="machines" element={<Machine />} />
             <Route path="computation" element={<Computation />} />
           </Route>
         </Routes>
-      </Router>
     </main>
   );
 }

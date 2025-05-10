@@ -4,6 +4,7 @@ const { Schema } = mongoose;
 const machineSchema = new Schema(
   {
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    walletAddress: {type: String},
     name: { type: String, required: true, unique: true },
     category: {type: String, enum: ['HIGH', 'MID', 'BASIC'], default: 'BASIC'},
     cpu: { type: String, required: true },
