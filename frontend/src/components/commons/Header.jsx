@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { Button } from "../ui/button";
 import { LogOut, User, Wallet2 } from "lucide-react"; // <--- added Wallet2

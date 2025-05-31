@@ -28,7 +28,7 @@ export default function RentTabs({ onChange }) {
         <Link key={index} to={tab.path} onClick={() =>{onChange(index)}}>
           <Button
             className={`offsetstyle p-2 w-36 border-2 border-black ${
-              activeIndex === index ? "bg-white text-black" : "bg-[#5B2333] text-white"
+              activeIndex === index ? "bg-[#d49c79] text-black" : "bg-[#5B2333] text-white"
             }`}
           >
             {tab.name}

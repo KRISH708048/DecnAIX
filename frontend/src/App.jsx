@@ -7,7 +7,7 @@ import "./App.css";
 import Layout from "./components/Rent/RentLayout";
 import Dashboard from "./components/Rent/Screens/Dashboard";
 import FeaturesWeights from "./components/Rent/Screens/FeaturesWeights";
-import CreateTask from "./components/Rent/Screens/CreateTask";
+import CreateTaskD from "./components/Rent/Screens/CreateTaskD";
 import SelectMachine from "./components/Rent/Screens/SelectMachine";
 import Transactions from "./components/Rent/Screens/Transactions";
 import ProviderLayout from "./components/provider/ProviderLayout";
@@ -63,7 +63,7 @@ function App() {
             <Route index element={<Dashboard />} />
             <Route path="machine" element={<Dashboard />} />
             <Route path="features-weights" element={<FeaturesWeights />} />
-            <Route path="create-task" element={<CreateTask />} />
+            <Route path="create-task" element={<CreateTaskD />} />
             <Route path="select-machine" element={<SelectMachine />} />
             <Route path="transactions" element={<Transactions />} />
           </Route>

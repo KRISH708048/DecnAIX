@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useState, } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "../ui/button";
 import { benefits } from "@/constants";
@@ -24,8 +24,8 @@ const Service = ({ startGlow }) => {
             style={{ backgroundImage: `url(${item.backgroundUrl})` }}
             key={item.id}
           >
-            <div className="relative z-2 rounded-2xl flex flex-col min-h-[22rem] p-[2.4rem] bg-[#f7f4f3]">
-              <h5 className="h5 mb-5 text-xl font-bold">{item.title}</h5>
+            <div className="relative z-2 rounded-2xl flex flex-col min-h-[22rem] p-[2.4rem] bg-[#e5b89c]">
+              <h5 className="h5 mb-5 text-xl font-bold text-center md:text-left">{item.title}</h5>
               <p className="body-2 mb-6 text-md font-mono">{item.text}</p>
               <div className="flex items-center mt-auto">
                 <img src={item.iconUrl} width={48} height={48} alt={item.title} />

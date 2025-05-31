@@ -38,21 +38,13 @@ const createTaskSchema = zod.object({
   password: zod.string().min(8),
 });
 
-const createTask = async (req, res) => {
+const uploadModel = async (req, res) => {
   let zipFilePath = req.file?.path;
   let ipfsHash = null;
 
   try {
-    const { name, duration, password } = req.body;
+    const { password } = req.body;
     const zipFile = req.file;
-    const validation = createTaskSchema.safeParse({ name, duration, password });
-    if (!validation.success) {
-      return res.status(400).json({
-        message: "Validation failed",
-        errors: validation.error.errors,
-      });
-    }
-
     if (!zipFile) {
       return res.status(400).json({ error: "Zip file missing!" });
     }
@@ -62,24 +54,8 @@ const createTask = async (req, res) => {
     if (!isZipFile(zipFilePath)) {
       return res.status(400).json({ error: "Invalid ZIP archive" });
     }
-
-    // Upload to IPFS
-    ipfsHash = await fileUploadToIPFS(zipFilePath, password, name);
-
-    // Create task in database
-    const newTask = await Task.create({
-      userId: req.userId,
-      name: validation.data.name,
-      ipfsCID: ipfsHash,
-      duration: validation.data.duration,
-      filePassword: password,
-      status: "PENDING",
-    });
-
-    return res.status(201).json({
-      message: "Task created successfully",
-      taskId: newTask._id,
-      name: validation.data.name,
+    ipfsHash = await fileUploadToIPFS(zipFilePath, password);
+    return res.status(200).json({
       cid: ipfsHash,
     });
   } catch (err) {
@@ -98,15 +74,63 @@ const createTask = async (req, res) => {
   }
 };
 
+const createTask = async (req, res) => {
+  let ipfsHash = null;
+
+  try {
+    const { name, duration, password, ipfsCID, onChainAccepted, taskNumber} = req.body;
+    const validation = createTaskSchema.safeParse({ name, duration, password});
+    if (!validation.success) {
+      return res.status(400).json({
+        message: "Validation failed",
+        errors: validation.error.errors,
+      });
+    }
+    ipfsHash = ipfsCID;
+    const onChain = onChainAccepted === "true";
+    if(!onChain){
+      await deleteFromPinata(ipfsCID);
+      return res.status(201).json({
+        message: "On-chain Declined!"
+      })
+    }
+    
+    const newTask = await Task.create({
+      userId: req.userId,
+      name: name,
+      ipfsCID: ipfsCID,
+      duration: duration,
+      filePassword: password,
+      taskNumber: taskNumber,
+      status: "PENDING",
+    });
+    return res.status(201).json({
+      message: "Task created successfully",
+      taskId: newTask._id,
+      name: name,
+      cid: ipfsCID,
+      duration: newTask.duration,
+      taskNumber: newTask.taskNumber,
+    });
+  } catch (err) {
+    console.error("Task creation error:", err);
+    if (ipfsHash) {
+      await deleteFromPinata(ipfsHash);
+    }
+    return res.status(500).json({
+      error: "Task creation failed",
+      details: err.message,
+    });
+  }
+};
+
 const createRequest = async (req, res) => {
   try {
     const { name, machineId, machineOwnerId } = req.body;
     if (!name || !machineId || !machineOwnerId) {
-      return res
-        .status(400)
-        .json({
-          message: "All fields (name, machineId, machineOwnerId) are required!",
-        });
+      return res.status(400).json({
+        message: "All fields (name, machineId, machineOwnerId) are required!",
+      });
     }
 
     const task = await Task.findOne({ name });
@@ -223,7 +247,7 @@ const requestApproval = async (req, res) => {
   try {
     const { approvalStatus, taskName, machineId } = req.body;
     const userId = req.userId;
-    console.log(approvalStatus, taskName, machineId );
+    console.log(approvalStatus, taskName, machineId);
     const approvals = approvalStatus.toUpperCase();
 
     if (!approvalStatus || !taskName || !machineId) {
@@ -282,7 +306,7 @@ const getStatusForTask = async (req, res) => {
   try {
     const { taskName } = req.params;
     const userId = req.userId;
-    console.log("njif")
+    console.log("njif");
     const task = await Task.findOne({ name: taskName, userId });
     if (!task) {
       return res.status(404).json({ error: "Task not found for this user" });
@@ -301,6 +325,7 @@ const getStatusForTask = async (req, res) => {
 };
 
 export default {
+  uploadModel,
   createTask,
   createRequest,
   allRequests,

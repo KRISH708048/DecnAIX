@@ -22,7 +22,7 @@ const encryptWithPassword = (inputPath, outputPath, password) => {
     });
 };
 
-const fileUploadToIPFS = async (zipFilePath, password, name) => {
+const fileUploadToIPFS = async (zipFilePath, password) => {
     let encryptedPath = `${zipFilePath}.enc`;
     let ipfsHash = null;
 
@@ -32,7 +32,7 @@ const fileUploadToIPFS = async (zipFilePath, password, name) => {
         
         const options = {
             pinataMetadata: {
-                name: `${name}_${Date.now()}.zip`,
+                name: `${Date.now()}.zip`,
                 keyvalues: {
                     encrypted: 'true',
                     modelType: 'machineLearning'

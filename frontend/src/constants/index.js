@@ -18,6 +18,7 @@ export const benefits = [
       iconUrl: Icon2,
       imageUrl: Service4,
       light: true,
+      link: "/Rent",
     },
     {
       id: "1",
@@ -26,6 +27,7 @@ export const benefits = [
       backgroundUrl: "./src/assets/benefits/card-3.svg",
       iconUrl: Icon3,
       imageUrl: Service5,
+      link: "/Provider"
     },
     {
       id: "2",

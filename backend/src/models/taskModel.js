@@ -8,6 +8,7 @@ const taskSchema = new Schema(
     ipfsCID: { type: String, required: true },
     filePassword : { type: String, required: true },
     duration: { type: Number, required: false },
+    taskNumber: {type: String, required: true},
     status: {
       type: String,
       enum: ["PENDING","REJECTED", "ACCEPTED"],

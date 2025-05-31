@@ -1,7 +1,6 @@
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { Button } from "../ui/button";
-import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import Service4 from "../../assets/svg/robot.png";
 import "./effect.css";
@@ -36,7 +35,7 @@ const Home = () => {
       {/* Main Content */}
       <div className="z-10 mt-12 grid grid-cols-1 md:grid-cols-2 items-center text-center gap-6 max-w-7xl mx-auto">
         {/* Text Content */}
-        <div className="text-[#e7d3cc]">
+        <div className="text-[#e5b89c]">
           <p className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl tracking-tight font-bold lato-bold leading-tight mb-4">
             Accelerate AI innovation with decentralized GPU power - train
             smarter, scale faster!
@@ -63,7 +62,7 @@ const Home = () => {
       <div className="flex justify-center mt-8">
         <Button
           onClick={scrollToService} // Calls function to scroll down
-          className="hover:bg-[#e7d3cc] hover:text-[#5B2333] text-[#5B2333] hover:shadow-4xl bg-[#F7F4F3] transition-transform ring-1 ring-black ring-offset-1 ring-offset-black transform hover:scale-105 p-3 font-semibold"
+          className="hover:bg-[#e7d3cc] hover:text-[#5B2333] text-[#5B2333] hover:shadow-4xl bg-[#e5b89c] transition-transform ring-1 ring-black ring-offset-1 ring-offset-black transform hover:scale-105 p-3 font-semibold"
         >
           Get Started
           <ArrowRight />
