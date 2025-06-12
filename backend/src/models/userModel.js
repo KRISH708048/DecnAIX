@@ -7,7 +7,6 @@ const userSchema = new Schema(
     email: { type: String, required: true, unique: true},
     role: { type: String, enum: ['Tenant', 'Provider', 'Both'], default: 'Both', required: true },
     hashedPassword: { type: String, required: true },
-    // passwordSalt: { type: String },
     wallet_address: { type: String, required: true },
   },
   { timestamps: true }
