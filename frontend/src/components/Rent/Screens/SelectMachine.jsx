@@ -188,9 +188,6 @@ export default function SearchWrapper() {
           <TabsContent value="Approval" className="mt-4">
             <Approval selectedMachine={selectedMachine}/>
           </TabsContent>
-          {/* <TabsContent value="Create_task" className="mt-4">
-            <CreateTask selectedMachine={selectedMachine} />
-          </TabsContent> */}
         </Tabs>
       </div>
     </div>

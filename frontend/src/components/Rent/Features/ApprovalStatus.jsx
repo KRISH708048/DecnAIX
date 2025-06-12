@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
-import { useRecoilValue } from "recoil";
-import { tasksAtom } from "@/store/taskAtom";
+// import { useRecoilValue } from "recoil";
+// import { tasksAtom } from "@/store/taskAtom";
 import {
   Card,
   CardHeader,
@@ -12,30 +12,32 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { twMerge } from "tailwind-merge";
 import { toast } from "sonner";
-import { userAtom } from "@/store/authAtom";
+// import { userAtom } from "@/store/authAtom";
+import { useNavigate } from "react-router-dom";
 
-const APPROVAL_STATUS = ["Pending", "Approved", "Rejected"];
-const MAX_POLL_ATTEMPTS = 10;
-const POLL_INTERVAL = 3000;
+// const APPROVAL_STATUS = ["Pending", "Approved", "Rejected"];
+// const MAX_POLL_ATTEMPTS = 10;
+// const POLL_INTERVAL = 3000;
 
 export default function approvalStatus({ selectedMachine }) {
-  const [selectedStatus, setSelectedStatus] = useState(0);
+  // const [selectedStatus, setSelectedStatus] = useState(0);
   const [taskName, setTaskName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const task = useRecoilValue(tasksAtom);
-  const user = useRecoilValue(userAtom);
+  // const task = useRecoilValue(tasksAtom);
+  // const user = useRecoilValue(userAtom);
+  const navigate = useNavigate();
 
   const pollForStatusChange = async (taskName) => {
     try {
       const token = localStorage.getItem("token");
       let status = "PENDING";
       let attempts = 0;
-      while (status === "PENDING" && attempts < MAX_POLL_ATTEMPTS) {
+      // while (status === "PENDING" && attempts < MAX_POLL_ATTEMPTS) {
         const res = await fetch(
           `http://localhost:3000/api/v1/task/status/task/${taskName}`,
           {
+            method: "GET",
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -43,39 +45,42 @@ export default function approvalStatus({ selectedMachine }) {
         );
 
         if (!res.ok) throw new Error("Failed to fetch status");
+        navigate('/Rent/weight');
 
-        const data = await res.json();
-        status = data?.status;
-        if (status === "WORKING") {
-          toast.success("Accepted!");
-          setSelectedStatus(1);
-          setIsLoading(false);
-          return status;
-        }
-        if(status === "REJECTED") {
-          toast.error("Rejected!");
-          setSelectedStatus(2);
-          setIsLoading(false);
-          return status;
-        }
+        // const data = await res.json();
+        // status = data?.status;
+        // if (status === "WORKING") {
+        //   toast.success("Accepted!");
+        //   setSelectedStatus(1);
+        //   setIsLoading(false);
+        //   return status;
+        // }
+        // if(status === "REJECTED") {
+        //   toast.error("Rejected!");
+        //   setSelectedStatus(2);
+        //   setIsLoading(false);
+        //   return status;
+        // }
 
-        attempts++;
-        await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL));
-      }
+        // attempts++;
+      //   await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL));
+      // }
 
-      if (status === "PENDING") {
-        toast.warning("Status still pending after several attempts.");
-        setIsLoading(false);
-      }
-      else if(status === "WORKING"){
-        toast.success("Accepted!");
-        setSelectedStatus(1);
-        setIsLoading(false);
-      }
+      // if (status === "PENDING") {
+      //   toast.warning("Status still pending after several attempts.");
+      //   setIsLoading(false);
+      // }
+      // else if(status === "WORKING"){
+      //   toast.success("Accepted!");
+      //   setSelectedStatus(1);
+      //   setIsLoading(false);
+      // }
     } catch (err) {
       setIsLoading(false);
       toast.error("Failed to fetch status.");
       console.error(err);
+    } finally{
+      setIsLoading(false);
     }
   };
 
@@ -89,6 +94,11 @@ export default function approvalStatus({ selectedMachine }) {
 
     try {
       const token = localStorage.getItem("token");
+      console.log( JSON.stringify({
+            name: taskName,
+            machineOwnerId: selectedMachine.userId || "Unknown",
+            machineId: selectedMachine.id,
+          }))
       const res = await fetch(
         `http://localhost:3000/api/v1/task/createRequest`,
         {
@@ -108,7 +118,7 @@ export default function approvalStatus({ selectedMachine }) {
       if (!res.ok) throw new Error("Failed to create request");
 
       toast.success("Request sent successfully.");
-      await pollForStatusChange(taskName);
+      // await pollForStatusChange(taskName);
     } catch (err) {
       setIsLoading(false);
       toast.error("Failed to send request. Please try again.");
@@ -152,7 +162,7 @@ export default function approvalStatus({ selectedMachine }) {
           </p>
         </div>
 
-        <div className="space-y-2">
+        {/* <div className="space-y-2">
           <Label className="text-gray-900">Approval Status</Label>
           <div className="flex gap-3 flex-wrap">
             {APPROVAL_STATUS.map((status, idx) => {
@@ -189,7 +199,7 @@ export default function approvalStatus({ selectedMachine }) {
               );
             })}
           </div>
-        </div>
+        </div> */}
       </CardContent>
 
       <CardFooter>

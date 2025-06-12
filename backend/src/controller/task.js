@@ -2,9 +2,9 @@ import fs from "fs";
 import Task from "../models/taskModel.js";
 import Machine from "../models/Machine.js";
 import User from "../models/userModel.js";
+import Status from "../models/statusModel.js";
 import zod from "zod";
 import pinataService from "../services/pinataServices.js";
-import Status from "../models/statusModel.js";
 
 const { fileUploadToIPFS, deleteFromPinata } = pinataService;
 
@@ -38,6 +38,7 @@ const createTaskSchema = zod.object({
   password: zod.string().min(8),
 });
 
+// file upload to ipfs
 const uploadModel = async (req, res) => {
   let zipFilePath = req.file?.path;
   let ipfsHash = null;
@@ -74,12 +75,14 @@ const uploadModel = async (req, res) => {
   }
 };
 
+// task creation 
 const createTask = async (req, res) => {
   let ipfsHash = null;
 
   try {
-    const { name, duration, password, ipfsCID, onChainAccepted, taskNumber} = req.body;
-    const validation = createTaskSchema.safeParse({ name, duration, password});
+    const { name, duration, password, ipfsCID, onChainAccepted, taskNumber } =
+      req.body;
+    const validation = createTaskSchema.safeParse({ name, duration, password });
     if (!validation.success) {
       return res.status(400).json({
         message: "Validation failed",
@@ -87,14 +90,15 @@ const createTask = async (req, res) => {
       });
     }
     ipfsHash = ipfsCID;
+    console.log(onChainAccepted);
     const onChain = onChainAccepted === "true";
-    if(!onChain){
+    if (!onChain) {
       await deleteFromPinata(ipfsCID);
       return res.status(201).json({
-        message: "On-chain Declined!"
-      })
+        message: "On-chain Declined!",
+      });
     }
-    
+
     const newTask = await Task.create({
       userId: req.userId,
       name: name,
@@ -104,6 +108,7 @@ const createTask = async (req, res) => {
       taskNumber: taskNumber,
       status: "PENDING",
     });
+    console.log(newTask);
     return res.status(201).json({
       message: "Task created successfully",
       taskId: newTask._id,
@@ -124,6 +129,7 @@ const createTask = async (req, res) => {
   }
 };
 
+// make machine request
 const createRequest = async (req, res) => {
   try {
     const { name, machineId, machineOwnerId } = req.body;
@@ -133,9 +139,10 @@ const createRequest = async (req, res) => {
       });
     }
 
-    const task = await Task.findOne({ name });
-    const check = await Status.findOne({ taskId: task._id });
-    if (check) {
+    const task = await Task.findOne({userId: req.userId, name: name});
+    const check = await Status.find({taskId: task._id });
+    
+    if (check.length>0) {
       if (check.status == "WORKING" || check.status == "COMPLETED")
         return res.status(404).json({ message: "In Process" });
       else if (check.status == "FAILED") {
@@ -158,7 +165,16 @@ const createRequest = async (req, res) => {
       });
     }
 
-    await Status.create({
+    if (!machine.available) {
+      return res.status(404).json({
+        message: "Request another Machine, due to non-availability!",
+        taskFound: !!task,
+        machineFound: !!machine,
+        ownerFound: !!machineOwner,
+      });
+    }
+
+    const newStatus = await Status.create({
       taskId: task._id,
       machineId,
       machineOwnerId,
@@ -176,6 +192,7 @@ const createRequest = async (req, res) => {
   }
 };
 
+// get all request a user have for its machines
 const allRequests = async (req, res) => {
   try {
     const userId = req.userId;
@@ -185,28 +202,22 @@ const allRequests = async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    if (user.role === "Tenant") {
-      return res
-        .status(403)
-        .json({ error: "Not authorized to perform this task" });
-    }
-
     const requests = await Status.find({ machineOwnerId: user._id })
       .sort({ createdAt: -1 })
       .populate({
         path: "taskId",
-        select: "name userId duration status", // Include userId from Task
+        select: "name userId duration taskNumber status", 
         populate: {
           path: "userId",
-          select: "name  wallet_address", // Get user name from Task's userId
+          select: "name  wallet_address", 
         },
       })
       .populate({
         path: "machineId",
-        select: "name userId _id", // Include machine name and owner's userId
+        select: "name userId _id", 
         populate: {
           path: "userId",
-          select: "name", // Get owner's name from Machine's userId
+          select: "name", 
         },
       });
 
@@ -215,6 +226,7 @@ const allRequests = async (req, res) => {
       taskName: req.taskId?.name || "N/A",
       status: req.status,
       duration: req.taskId?.duration || "N/A",
+      taskNumber: req.taskId?.taskNumber || "N/A",
       walletAddress: req.taskId?.userId?.wallet_address || "N/A",
       machineName: req.machineId?.name || "N/A",
       machineId: req.machineId?._id || "N/A",
@@ -243,18 +255,17 @@ const allRequests = async (req, res) => {
   }
 };
 
+// machine grant by owner
 const requestApproval = async (req, res) => {
   try {
     const { approvalStatus, taskName, machineId } = req.body;
     const userId = req.userId;
-    console.log(approvalStatus, taskName, machineId);
     const approvals = approvalStatus.toUpperCase();
 
     if (!approvalStatus || !taskName || !machineId) {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
-    // Verify user owns the machine
     const machine = await Machine.findOne({ _id: machineId, userId: userId });
     if (!machine) {
       return res
@@ -292,6 +303,9 @@ const requestApproval = async (req, res) => {
     request.status = "WORKING";
     await request.save();
 
+    machine.available = false;
+    await machine.save();
+
     return res.status(200).json({
       message: "Request accepted successfully",
       response: true,
@@ -302,12 +316,12 @@ const requestApproval = async (req, res) => {
   }
 };
 
+// to know ongoing status of task
 const getStatusForTask = async (req, res) => {
   try {
     const { taskName } = req.params;
     const userId = req.userId;
-    console.log("njif");
-    const task = await Task.findOne({ name: taskName, userId });
+    const task = await Task.findOne({ name: taskName, userId: userId });
     if (!task) {
       return res.status(404).json({ error: "Task not found for this user" });
     }
@@ -324,6 +338,54 @@ const getStatusForTask = async (req, res) => {
   }
 };
 
+// get all the task created by user
+const allTask = async (req, res) => {
+  try {
+    const userId = req.userId;
+
+    const tasks = await Task.find({ userId: userId }).sort({ createdAt: -1 });
+
+    const taskIds = tasks.map((task) => task._id);
+
+    const statuses = await Status.find({ taskId: { $in: taskIds } })
+      .sort({ createdAt: -1 })
+      .populate({
+        path: "taskId",
+        select: "name userId duration taskNumber status",
+        populate: {
+          path: "userId",
+          select: "name walletAddress",
+        },
+      })
+      .populate({
+        path: "machineId",
+        select: "name userId _id",
+        populate: {
+          path: "userId",
+          select: "name",
+        },
+      });
+
+    const formatted = statuses.map((req) => ({
+      taskId: req.taskId?._id || "N/A",
+      taskName: req.taskId?.name || "N/A",
+      userId: req.taskId?.userId?._id || "N/A",
+      walletAddress: req.taskId?.userId?.walletAddress || "N/A",
+      duration: req.taskId?.duration || "N/A",
+      status: req.status || "PENDING",
+      machineId: req.machineId?._id || "N/A",
+      machineName: req.machineId?.name || "N/A",
+      machineOwnerId: req.machineId?.userId?._id || "N/A",
+      machineOwnerName: req.machineId?.userId?.name || "N/A",
+    }));
+
+    res.status(200).json(formatted);
+  } catch (err) {
+    console.error("Error fetching tasks with status:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
 export default {
   uploadModel,
   createTask,
@@ -331,4 +393,5 @@ export default {
   allRequests,
   requestApproval,
   getStatusForTask,
+  allTask
 };

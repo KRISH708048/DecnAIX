@@ -16,25 +16,15 @@ const machineSchema = zod.object({
 const createMachine = async (req, res) => {
   try {
     let machineDetail = req.body;
-    machineDetail.available = true; // default
-    // { userID, title, type, cpu, ram, size, available = true }
-    console.log("Creating machine:", req.body);
+    machineDetail.available = true; 
     const response = machineSchema.safeParse(machineDetail);
     if (!response.success) {
       return res.status(411).json({
         message: "Incorrect machine details provided",
       });
     }
-
-    // Validate userID format (it should be a valid ObjectId)
-    // if (!userID || !userID.match(/^[0-9a-fA-F]{24}$/)) {
-    //     return res.status(400).json({ message: "Invalid user ID format" });
-    // }
     const userId = req.userId;
     console.log(`creating machine for user with ID: ${userId}`);
-    // cpu = parseInt(cpu);
-    // ram = parseInt(ram);
-    // size = parseInt(size);
 
     const newMachine = await Machine.create({
       userId: userId,
@@ -110,13 +100,12 @@ const getAllMachines = async (req, res) => {
 const getMachinesByUserId = async (req, res) => {
   try {
     const userID  = req.userId;
-    // Use `findById` for efficiency
+
     const user = await User.findById(userID);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Fetch machines for the user
     const userMachines = await Machine.find({ userId: userID });
 
     return res.status(200).json({ machines: userMachines });

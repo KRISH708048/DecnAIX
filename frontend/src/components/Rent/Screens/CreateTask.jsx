@@ -14,60 +14,80 @@ import { useRecoilState } from "recoil";
 import { tasksAtom } from "@/store/taskAtom";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import { UploadCloud, FileArchive, Clock, Key, Tag } from "lucide-react";
+import { Clock, Key, Tag } from "lucide-react";
 import { getContract } from "@/utils/contract";
+import CodeAcceptor from "../Features/CodeAcceptor";
 
 export default function CreateTask() {
-
-  const [zipFile, setZipFile] = useState(null);
   const [uploading, setUploading] = useState(false);
-  const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState(null);
   const [taskName, setTaskName] = useState("");
   const [filePassword, setFilePassword] = useState("");
   const [reservedFor, setReservedFor] = useState("");
+  const [ipfsCid, setIpfsCid] = useState("");
+  const [chainStatus, setChainStatus] = useState(false);
   const [tasks, setTasks] = useRecoilState(tasksAtom);
   const navigate = useNavigate();
 
-  const handleFile = (file) => {
-    if (file && file.name.endsWith(".zip")) {
-      setZipFile(file);
-      setError(null);
-    } else {
-      setError("Only .zip files are allowed.");
-      setZipFile(null);
-    }
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    setDragActive(false);
-    handleFile(e.dataTransfer.files[0]);
-  };
-
   const handleStart = async () => {
-    if (!zipFile) return setError("Please upload a ZIP file.");
-    if (!taskName || !filePassword || !reservedFor)
+    if (!taskName || !filePassword || !reservedFor || !ipfsCid)
       return setError("All fields are required.");
 
     setUploading(true);
     setError(null);
 
     const formData = new FormData();
-    formData.append("zipFile", zipFile);
     formData.append("password", filePassword);
     formData.append("name", taskName);
     formData.append("duration", reservedFor);
+    formData.append("ipfsCID", ipfsCid);
 
     try {
+      const contract = await getContract();
+      console.log(
+        ipfsCid,
+        filePassword,
+        reservedFor,
+        typeof reservedFor
+      );
+      const tx = await contract.createTask(
+        ipfsCid,
+        filePassword,
+        reservedFor
+      );
+      const receipt = await tx.wait();
+      let num;
+      let chstatus = "false";
+      if (receipt.status === 1) {
+        chstatus = "true";
+        num = Number(receipt.logs[0]["args"][0]);
+        console.log(num);
+        formData.append("taskNumber", String(num));
+        console.log("Task created on chain");
+      }
+      else{
+        console.log("declined on chain");
+        num = -1;
+        formData.append("taskNumber", String(-1));
+      }
+      formData.append("onChainAccepted", chstatus);
       const token = localStorage.getItem("token");
-
+      const sendData = {
+        name: taskName,
+        duration: String(reservedFor),
+        password: filePassword,
+        ipfsCID: ipfsCid,
+        onChainAccepted: chstatus,
+        taskNumber: String(num),
+      };
+      console.log(sendData);
       const response = await fetch("http://localhost:3000/api/v1/task/createTask", {
         method: "POST",
         headers: {
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: formData,
+        body: JSON.stringify(sendData),
       });
 
       if (!response.ok) {
@@ -75,7 +95,7 @@ export default function CreateTask() {
       }
 
       const data = await response.json();
-        
+
       const newTask = {
         id: data.taskId,
         name: data.name,
@@ -85,12 +105,6 @@ export default function CreateTask() {
         createdAt: new Date().toISOString(),
       };
 
-      const contract = await getContract();
-      console.log(data, newTask.id, newTask.cid, filePassword, newTask.duration, typeof(newTask.duration), )
-      const tx = await contract.createTask(newTask.id, newTask.cid, filePassword, newTask.duration);
-      await tx.wait();
-      console.log("Task created on chain");
-
       setTasks(newTask);
       console.log(tasks);
 
@@ -99,8 +113,8 @@ export default function CreateTask() {
       });
 
       navigate("/Rent/select-machine");
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
       setError("An error occurred during upload.");
       toast.error("Error", {
         description: "Failed to create task",
@@ -124,7 +138,10 @@ export default function CreateTask() {
       <CardContent className="space-y-6 mt-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <Label htmlFor="task-name" className="flex items-center gap-2 text-sm font-medium">
+            <Label
+              htmlFor="task-name"
+              className="flex items-center gap-2 text-sm font-medium"
+            >
               <Tag className="h-4 w-4" />
               Task Name
             </Label>
@@ -138,7 +155,10 @@ export default function CreateTask() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="file-password" className="flex items-center gap-2 text-sm font-medium">
+            <Label
+              htmlFor="file-password"
+              className="flex items-center gap-2 text-sm font-medium"
+            >
               <Key className="h-4 w-4" />
               File Password
             </Label>
@@ -153,7 +173,10 @@ export default function CreateTask() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="duration" className="flex items-center gap-2 text-sm font-medium">
+            <Label
+              htmlFor="duration"
+              className="flex items-center gap-2 text-sm font-medium"
+            >
               <Clock className="h-4 w-4" />
               Duration (in hours)
             </Label>
@@ -168,58 +191,7 @@ export default function CreateTask() {
             />
           </div>
         </div>
-
-        <div className="space-y-2">
-          <Label className="flex items-center gap-2 text-sm font-medium">
-            <FileArchive className="h-4 w-4" />
-            Upload ZIP File
-          </Label>
-          <div
-            className={`border-2 border-dashed rounded-2xl p-8 text-center transition-all duration-300 ease-in-out ${
-              dragActive
-                ? "border-[#5b2333] bg-[#5b2333]/10 scale-105"
-                : "border-gray-500 hover:border-[#5b2333] hover:scale-105 dark:border-gray-600"
-            }`}
-            onDragOver={(e) => {
-              e.preventDefault();
-              setDragActive(true);
-            }}
-            onDragLeave={() => setDragActive(false)}
-            onDrop={handleDrop}
-          >
-            <input
-              type="file"
-              accept=".zip"
-              onChange={(e) => handleFile(e.target.files[0])}
-              className="hidden"
-              id="zip-upload"
-            />
-            <label
-              htmlFor="zip-upload"
-              className="flex flex-col items-center justify-center space-y-2 cursor-pointer"
-            >
-              <UploadCloud
-                className={`h-12 w-12 ${
-                  dragActive ? "text-[#5b2333]" : "text-gray-400"
-                } transition-colors`}
-              />
-              {zipFile ? (
-                <div className="flex items-center gap-2 mt-2">
-                  <FileArchive className="h-5 w-5 text-[#5b2333]" />
-                  <span className="font-semibold text-[#5b2333]">{zipFile.name}</span>
-                </div>
-              ) : (
-                <>
-                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Drag & drop your ZIP file here
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">or click to browse</p>
-                </>
-              )}
-            </label>
-          </div>
-        </div>
-
+        <CodeAcceptor setIpfsCid={setIpfsCid} filePassword={filePassword} />
         {error && (
           <div className="bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400 p-3 rounded-lg font-medium text-sm shadow-inner">
             {error}

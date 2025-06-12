@@ -3,6 +3,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { RefreshCw, Loader2, ChevronDown, ChevronUp } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { getContract } from "@/utils/contract";
 
 const ComputationDashboard = () => {
   const [dashboardData, setDashboardData] = useState(null);
@@ -49,6 +50,13 @@ const ComputationDashboard = () => {
     try {
       const actionKey = `${task._id}-${approvalStatus.toLowerCase()}`;
       setLoadingAction(actionKey);
+      
+      const contract = await getContract();
+      const tx = await contract.acceptTask(Number(task.taskNumber));
+      const receipt = await tx.wait();
+      if(receipt.status !== 1){
+        approvalStatus = "Rejected";
+      }
 
       const token = localStorage.getItem("token");
       const body = {

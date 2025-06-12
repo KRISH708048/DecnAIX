@@ -1,18 +1,22 @@
 import express from 'express';
-import authenticate from '../middlewares/authMiddleware.js';
 import multer from 'multer';
 import taksController from '../controller/task.js';
+import { authorizedRenter } from '../middlewares/authorization.js';
+import { authorizedProvider } from '../middlewares/authorization.js';
 
 const router = express.Router();
-const secretKey = 'your-strong-secret-key';
 const upload = multer({ dest: 'uploads/' });
+const {uploadModel, createTask, createRequest, allRequests, requestApproval, getStatusForTask, allTask} = taksController;
 
-const {uploadModel, createTask, createRequest, allRequests, requestApproval, getStatusForTask} = taksController;
-router.post('/upload_Model', authenticate, upload.single('zipFile'), uploadModel);
-router.post('/createTask', authenticate, createTask);
-router.post('/createRequest', authenticate, createRequest);
-router.get('/allRequests', authenticate, allRequests);
-router.put('/requestApproval', authenticate, requestApproval);
-router.get('/status/task/:taskName', authenticate, getStatusForTask);
+// for renter
+router.post('/upload_Model', authorizedRenter, upload.single('zipFile'), uploadModel);
+router.post('/createTask', authorizedRenter, createTask);
+router.post('/createRequest', authorizedRenter, createRequest);
+router.get('/status/task/:taskName', authorizedRenter, getStatusForTask);
+router.get('/allTasks', authorizedRenter, allTask)
+
+// for provider
+router.get('/allRequests', authorizedProvider, allRequests);
+router.put('/requestApproval',authorizedProvider, requestApproval);
 
 export default router;
