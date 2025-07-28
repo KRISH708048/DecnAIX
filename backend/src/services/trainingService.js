@@ -19,10 +19,10 @@ export default function generateDockerfile(zipCid, zipPassword) {
 
   # Extract the contents
   RUN unzip decrypted.zip -d .
-
+  
   # Install Python dependencies
   RUN pip install --no-cache-dir -r requirements.txt
-
+  COPY ..
   # Ensure the output directory exists (will be mounted later)
   VOLUME ["/data_base"]
 
